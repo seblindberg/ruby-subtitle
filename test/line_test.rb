@@ -115,12 +115,20 @@ describe Subtitle::Line do
   
   describe 'adding more lines' do
     before do
-      first_line = line
-      @lines = (1..10).inject(line) do |prev_line, index|
-        subject.new index..(index + 1), previous_line: prev_line
+      @first_line = subject.new 1..2, 1
+      @last_line  = (2..10).inject(@first_line) do |prev_line, index|
+        subject.new index..(index + 1), index, previous_line: prev_line
       end
     end
     
-    
+    it 'iterates over all the lines' do
+      line = @first_line
+      1.upto 9 do |index|
+        assert_equal index.to_s, line.text
+        line = line.next
+      end
+      
+      assert_raises(StopIteration) { line.next }
+    end
   end
 end

@@ -18,6 +18,7 @@ module Subtitle
       end
     end
     
+    # Begin
     #
     # Returns the start time of the subtitle line.
     #
@@ -29,6 +30,7 @@ module Subtitle
     alias_method :start, :begin
     
     
+    # End
     #
     # Returns the end time of the subtitle line.
     #
@@ -38,6 +40,7 @@ module Subtitle
     end
     
     
+    # During?
     #
     # Test if the line is visible during the time given.
     #
@@ -46,13 +49,31 @@ module Subtitle
       @time_span.cover? time
     end
     
+    
+    # Before?
+    #
+    # 
+    #
+    
     def before? time
       @time_span.end < time
     end
     
+    
+    # After?
+    #
+    # 
+    #
+    
     def after? time
       @time_span.begin > time
     end
+    
+    
+    # Duration
+    #
+    # 
+    #
     
     def duration
       self.end - start
@@ -81,26 +102,77 @@ module Subtitle
     alias_method :&, :intersect
     
     
+    # Intersect
+    #
+    # Check if this line intersects with another line, a range or some other 
+    # custom object. See #intersect for more details.
+    #
+    
     def intersect? time_span
       self & time_span > 0
     end
     
     
+    # Next
+    #
+    # Get the line after this one. Raises a StopIteration exception if this line 
+    # is the last.
+    #
+    
     def next
       raise StopIteration if last?
+      @next_line
     end
     
-    def next= line
+    
+    # Next =
+    #
+    # Protected setter of the next line. This method is only ment to be called 
+    # by other lines when adding, moving or removing them.
+    #
+    
+    protected def next= line
       @next_line = line
     end
     
+    
+    # Previous
+    #
+    # Get the previous line. Raises a StopIteration exception if this line is
+    # the first.
+    #
+    
     def previous
       raise StopIteration if first?
+      @prev_line
     end
+    
+    
+    # Previous =
+    #
+    # Protected setter of the previous line. This method is only ment to be 
+    # called by other lines when adding, moving or removing them.
+    #
+    
+    protected def previous= line
+      @prev_line = line
+    end
+    
+    
+    # First?
+    #
+    # 
+    #
     
     def first?
       @prev_line.nil?
     end
+    
+    
+    # Last?
+    #
+    # 
+    #
     
     def last?
       @next_line.nil?
