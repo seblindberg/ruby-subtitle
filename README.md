@@ -1,8 +1,12 @@
-# Subtitle
+# Ruby-Subtitle
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/subtitle`. To experiment with that code, run `bin/console` for an interactive prompt.
+This gem implements a generic representation of a subtitle in Ruby. The goal is to support reading, parsing and writing to the most common subtitle formats out there, such as SubRip (.srt) and MicroDVD (.sub), while providing an intermediary format that is easy to work with in code.
 
-TODO: Delete this and the text above, and describe your gem
+Taking cues from the different subtitle formats out there, a subtitle is modelled as a collection of lines, where each line has a defined start and end time. The lines also support a number of different formatting options, such as font weight, text color and so on. 
+
+There is a large focus on timing, with built in support for quite complex time shifting operations. Both the whole subtitle, as well as individual lines, can be shifted in time relative to their original positions.
+
+Another area of focus is iteration, with many different iterating methods supporting looping over lines both forwards and in reverse, freely and in between boundaries.
 
 ## Installation
 
