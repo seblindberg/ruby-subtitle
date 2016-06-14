@@ -6,7 +6,7 @@ describe Subtitle::Line do
   let(:start_at)  { 1000 }
   let(:end_at)    { 1950 }
   let(:time_span) { start_at..end_at }
-  let(:text)      { 'Test line\ntesting lines' }
+  let(:text)      { "Test line\ntesting lines" }
   let(:line)      { subject.new time_span, text }
   
   describe 'creating lines' do
@@ -128,7 +128,44 @@ describe Subtitle::Line do
         line = line.next
       end
       
+      p @first_line
+      
       assert_raises(StopIteration) { line.next }
+    end
+  end
+  
+  
+  describe '#format' do
+    it 'returns the formatting object' do
+      f = line.format
+      assert_kind_of Subtitle::Formatting, f
+      assert_equal line.formatting.values.first, f
+    end
+    
+    it 'allows for applying styles to the entire line' do
+      f = line.format bold: true, italic: true
+            
+      assert f.bold?
+      assert f.italic?
+      refute f.underline?
+    end
+    
+    it 'styles complete sections of the line' do
+      f = line.format 0
+      
+      assert_equal 0,                    f.section.begin
+      assert_equal text.index("\n") - 1, f.section.end
+      
+      f = line.format 1
+      
+      assert_equal text.index("\n") + 1, f.section.begin
+      assert_equal text.length - 1,      f.section.end
+    end
+    
+    it 'does not create new formatting objects for the same sections' do
+      f = line.format 1..4
+      refute_equal f, line.format(0..5)
+      assert_equal f, line.format(1..4)
     end
   end
 end
