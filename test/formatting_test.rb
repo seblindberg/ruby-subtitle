@@ -3,15 +3,9 @@ require 'test_helper'
 describe Subtitle::Formatting do
   subject { Subtitle::Formatting }
   
-  describe 'creating a formatting block' do
-    it 'accepts a range of characters to apply to' do
-      range = 5..8
-      formatting = subject.new range
-      assert_equal range, formatting.section
-    end
-    
+  describe 'creating a formatting block' do    
     it 'has no formatting initially' do
-      formatting = subject.new 0..1
+      formatting = subject.new
       
       refute formatting.bold?
       refute formatting.italic?
@@ -20,12 +14,20 @@ describe Subtitle::Formatting do
       refute formatting.font_name
       refute formatting.font_size
     end
+    
+    it 'accepts a hash of initial formatting' do
+      formatting = subject.new bold: true, italic: true
+      
+      assert formatting.bold?
+      assert formatting.italic?
+      refute formatting.underline?
+    end
   end
   
   
   describe '#apply' do
     before do 
-      @formatting = subject.new 0..1
+      @formatting = subject.new
     end
     
     it 'applies font weight' do

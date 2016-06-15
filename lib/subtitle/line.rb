@@ -3,10 +3,15 @@
 # Represents the individual lines of a subtitle. Conceptually a line is one 
 # frame of text and has a start and end time, between which it is shown.
 #
+# Each line can also be treated as a line set through its connection to its
+# neighbouring lines. The #first_line and #last_line methods are implemented
+# for this purpose and always return the line itself.
 #
 
 class Subtitle
   class Line
+    include LineSet
+    
     attr_reader :text, :formatting
     
     
@@ -24,7 +29,7 @@ class Subtitle
       previous_line.next = self if previous_line
       
       @formatting = Hash.new do |list, section|
-        list[section] = Formatting.new section
+        list[section] = Formatting.new
       end
       
       self
@@ -75,7 +80,7 @@ class Subtitle
     # given time.
     
     def before? time
-      @time_span.end < time
+      @time_span.end <= time
     end
     
     
@@ -85,7 +90,7 @@ class Subtitle
     # given time.
     
     def after? time
-      @time_span.begin > time
+      @time_span.begin >= time
     end
     
     
@@ -180,6 +185,15 @@ class Subtitle
     end
     
     
+    def first_line
+      self
+    end
+    
+    def last_line
+      self
+    end
+    
+    
     # Format
     #
     # Accept the various styling options as named arguments.
@@ -187,7 +201,7 @@ class Subtitle
     # controlled as follows:
     # - nil applies to the entire line
     # - 0, 1, ... applies to the first, second and so on section of text 
-    #     separated by new-line characters
+    #   separated by new-line characters
     # - 0..n applies to the characters at index 0 through n
     
     def format section = nil, formatting = {}

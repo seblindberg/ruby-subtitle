@@ -45,22 +45,22 @@ describe Subtitle::Line do
   
   describe '#before?' do
     it 'is before times after its end' do
-      assert line.before? (end_at + 1)
+      assert line.before? (end_at)
     end
     
     it 'is not before times before its end' do
-      refute line.before? (end_at)
+      refute line.before? (end_at - 1)
     end
   end
   
   
   describe '#after?' do
     it 'is after times before its start' do
-      assert line.after? (start_at - 1)
+      assert line.after? (start_at)
     end
     
     it 'is not after times before its start' do
-      refute line.after? (start_at)
+      refute line.after? (start_at + 1)
     end
   end
   
@@ -113,28 +113,6 @@ describe Subtitle::Line do
     end
   end
   
-  describe 'adding more lines' do
-    before do
-      @first_line = subject.new 1..2, 1
-      @last_line  = (2..10).inject(@first_line) do |prev_line, index|
-        subject.new index..(index + 1), index, previous_line: prev_line
-      end
-    end
-    
-    it 'iterates over all the lines' do
-      line = @first_line
-      1.upto 9 do |index|
-        assert_equal index.to_s, line.text
-        line = line.next
-      end
-      
-      p @first_line
-      
-      assert_raises(StopIteration) { line.next }
-    end
-  end
-  
-  
   describe '#format' do
     it 'returns the formatting object' do
       f = line.format
@@ -152,14 +130,16 @@ describe Subtitle::Line do
     
     it 'styles complete sections of the line' do
       f = line.format 0
+      section = line.formatting.key f
       
-      assert_equal 0,                    f.section.begin
-      assert_equal text.index("\n") - 1, f.section.end
+      assert_equal 0,                    section.begin
+      assert_equal text.index("\n") - 1, section.end
       
       f = line.format 1
+      section = line.formatting.key f
       
-      assert_equal text.index("\n") + 1, f.section.begin
-      assert_equal text.length - 1,      f.section.end
+      assert_equal text.index("\n") + 1, section.begin
+      assert_equal text.length - 1,      section.end
     end
     
     it 'does not create new formatting objects for the same sections' do

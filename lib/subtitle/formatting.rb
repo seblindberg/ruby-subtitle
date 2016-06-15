@@ -1,57 +1,32 @@
-# Supported formatting options are:
+# Formatting
 #
+# The role of the formatting object is just to provide a mutable collection of 
+# supported formatting options. The object has no knowledge of what the styling 
+# applies to.
+#
+# Supported formatting options are:
 # - Bold
 # - Italic
 # - Underline
 # - Color
 # - Font name
 # - Font size
+#
+# Things left to do:
+# - Add position as a formating option
+# - Introduce some form of validation of the styling? Or make it completely 
+#   dynamic
+#
 
 class Subtitle
   class Formatting
-    attr_reader :section #, :color, :font_name, :font_size
-    
-    # Bit fields for the binary styling options
-    
-    #BOLD      = 0x01
-    #ITALIC    = 0x02
-    #UNDERLINE = 0x04
-    
-    
+        
     # Initialize
     #
-    # Accept the various styling options as named arguments.
-    # Using apply to the scope of the formatting can be 
-    # controlled as follows:
-    # - nil applies to the entire line
-    # - 0, 1, ... applies to the first, second and so on section of text 
-    #   separated by new-line characters
-    # - 0..n applies to characters 0 to n
+    # Accept a hash of initial formatting options
     
-    def initialize section
-                   # bold: false, 
-                   # italic: false,
-                   # underline: false,
-                   # color: nil,
-                   # font_name: nil,
-                   # font_size: nil
-      
-      # Make sure apply_to is of the correct type
-      unless Range === section
-        raise TypeError, 
-            "Unknown formatting section: #{section.inspect}"
-      end
-      
-      @section    = section
+    def initialize formatting = {}
       @formatting = formatting
-            
-      # @style     = (bold ?      BOLD      : 0) | 
-      #              (italic ?    ITALIC    : 0) | 
-      #              (underline ? UNDERLINE : 0)
-      # 
-      # @color     = color
-      # @font_name = font_name
-      # @font_size = font_size
     end
     
     
