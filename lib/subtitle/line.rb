@@ -194,6 +194,13 @@ class Subtitle
     end
     
     
+    def delete
+      # Get the lines on either side of this line and connect them up
+      @next_line.previous = @prev_line unless last?
+      @prev_line.next     = @next_line unless first?
+    end
+    
+    
     # Format
     #
     # Accept the various styling options as named arguments.

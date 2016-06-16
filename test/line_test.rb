@@ -113,6 +113,34 @@ describe Subtitle::Line do
     end
   end
   
+  
+  describe '#delete' do
+    before do
+      @first_line = subject.new 1..2
+      @middle_line = subject.new 2..3, previous_line: @first_line
+      @last_line = subject.new 3..4, previous_line: @middle_line
+    end
+    
+    it 'deletes the first line' do
+      refute @middle_line.first?
+      @first_line.delete
+      assert @middle_line.first?
+    end
+    
+    it 'deletes the middle line' do
+      @middle_line.delete
+      assert_equal @last_line, @first_line.next
+      assert_equal @first_line, @last_line.previous
+    end
+    
+    it 'deletes the last line' do
+      refute @middle_line.last?
+      @last_line.delete
+      assert @middle_line.last?
+    end
+  end
+  
+  
   describe '#format' do
     it 'returns the formatting object' do
       f = line.format
