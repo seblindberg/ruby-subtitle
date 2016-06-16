@@ -5,20 +5,23 @@ describe Subtitle::LineSet do
   # implements it
   subject { Subtitle::Line }
   
+  let(:n_lines) { 7 }
+  
   before do
     @first_line = subject.new 1..2, 1
-    @last_line  = (2..10).inject(@first_line) do |prev_line, index|
+    @last_line  = (2..n_lines).inject(@first_line) do |prev_line, index|
       subject.new index..(index + 1), index, previous_line: prev_line
     end
   end
   
   describe '#each' do
     it 'enumerates lines before a time' do
-      lines = @first_line.each(before: 5).count
+      index = 5
+      lines = @first_line.each(before: index).count
       
       # The fourth line starts at 4 and ends at 5, so it is
       # the last that should be counted
-      assert_equal 4, lines
+      assert_equal index - 1, lines
     end
     
     it 'enumerates lines before a line' do
@@ -26,23 +29,24 @@ describe Subtitle::LineSet do
       lines = @first_line.each(before: @last_line).count
       
       # All but the last line (9 in total) should be counted
-      assert_equal 9, lines
+      assert_equal n_lines - 1, lines
     end
     
     it 'enumerates lines after a time' do
       # Count lines that start at or after 5
-      lines = @first_line.each(after: 5).count
+      index = 5
+      lines = @first_line.each(after: index).count
       
       # The fifth line starts at 5, which is considered to
       # occur after 5
-      assert_equal 6, lines
+      assert_equal n_lines - index + 1, lines
     end
     
     it 'enumerates lines after a line' do
       # Count lines that start after the first lines has
       # ended
       lines = @first_line.each(after: @first_line).count
-      assert_equal 9, lines
+      assert_equal n_lines - 1, lines
     end
   end
   
@@ -70,8 +74,8 @@ describe Subtitle::LineSet do
     end
     
     it 'truncates the resulting array when there are not enough lines' do
-      lines = @first_line.first 20
-      assert_equal 10, lines.count
+      lines = @first_line.first (n_lines + 1)
+      assert_equal n_lines, lines.count
     end
   end
   
@@ -102,8 +106,30 @@ describe Subtitle::LineSet do
     end
     
     it 'truncates the resulting array when there are not enough lines' do
-      lines = @first_line.last 20
-      assert_equal 10, lines.count
+      lines = @first_line.last (n_lines + 1)
+      assert_equal n_lines, lines.count
+    end
+  end
+  
+  
+  describe '#delete_at' do
+    it 'deletes the first line when the offset is 0' do
+      second_line = @first_line.next
+      refute second_line.first?
+      @first_line.delete_at 0
+      assert second_line.first?
+    end
+    
+    it 'deletes the second line when the offset is 1' do
+      third_line = @first_line.next.next
+      @first_line.delete_at 1
+      assert_equal third_line, @first_line.next
+    end
+    
+    it 'does not delete any line if the offset exceeds the line count' do
+      lines_before_delete = @first_line.to_a
+      @first_line.delete_at n_lines
+      assert_equal lines_before_delete, @first_line.to_a
     end
   end
 end

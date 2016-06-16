@@ -163,5 +163,17 @@ class Subtitle
     ensure
       return res
     end
+    
+    
+    def delete_at offset
+      line = first_line
+      return unless line
+      
+      offset.times { line = line.next }
+      
+      line.delete
+      
+    rescue StopIteration
+    end
   end
 end
