@@ -1,7 +1,23 @@
 require 'test_helper'
 
-class SubtitleTest < Minitest::Test
-  def test_that_it_has_a_version_number
-    refute_nil ::Subtitle::VERSION
+describe Subtitle do
+  subject { Subtitle }
+  let(:subtitle) { subject.new }
+  
+  it 'has a version number' do
+    refute_nil subject::VERSION
+  end
+  
+  it 'has no lines when initially created' do
+    assert_nil subtitle.first_line
+    assert_nil subtitle.last_line
+  end
+  
+  describe '#add' do
+    it 'adds a line' do
+      assert_nil subtitle.first_line
+      subtitle.add 1..2
+      assert_kind_of subject::Line, subtitle.first_line
+    end
   end
 end

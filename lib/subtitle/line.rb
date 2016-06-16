@@ -185,11 +185,11 @@ class Subtitle
     end
     
     
-    def first_line
+    protected def first_line
       self
     end
     
-    def last_line
+    protected def last_line
       self
     end
     
