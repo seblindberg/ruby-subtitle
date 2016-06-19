@@ -1,6 +1,17 @@
 # Line Set
 #
-# 
+# The line set introduces the concept of a collection of lines. A line set 
+# starts and ends with two special lines that either have no previous or next 
+# line associated with them.
+#
+# +-------+--------+--------+-   -+--------+------+
+# | First | Line 0 | Line 1 | ... | Line n | Last |
+# +-------+--------+--------+-   -+--------+------+
+#
+# To support the LineSet module the object including it must implement the 
+# following (protected) methods:
+# - #first_line returning a FirstLine object
+# - #last_line  returning a LastLine object
 
 class Subtitle
   module LineSet
@@ -70,10 +81,8 @@ class Subtitle
       
       # Initialize line and res in acordance with the value
       # of n
-      line = first_line
       res  = nil
-      
-      return unless line
+      line = first_line.next
       
       # Find the first line that occurs after the given time,
       # if a time was in fact given
@@ -116,10 +125,8 @@ class Subtitle
     def last n = 1, before: nil
       
       line      = nil
-      next_line = first_line
       res       = nil
-      
-      return unless next_line
+      next_line = first_line.next
       
       # Create the condition for continuing the loop, given
       # a line
@@ -172,18 +179,16 @@ class Subtitle
     
     def delete_at offset
       if offset >= 0
-        line = first_line
-        return unless line
-        
+        # Try to get the first real line
+        line = first_line.next
+                
         offset.times { line = line.next }
       else
-        line = last_line
-        return unless line
-        
+        # Try to get the last real line
+        line = last_line.previous
+                
         (-offset - 1).times { line = line.previous }
       end
-      
-     
       
       line.delete
       

@@ -23,10 +23,10 @@ describe Subtitle::Line do
       assert_kind_of String, line.text
     end
     
-    it 'is both the first and last line when none where given' do
-      assert line.last?
-      assert line.first?
-    end
+    # it 'is both the first and last line when none where given' do
+    #   assert line.last?
+    #   assert line.first?
+    # end
   end
   
   

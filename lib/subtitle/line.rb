@@ -9,8 +9,8 @@
 #
 
 class Subtitle
-  class Line
-    include LineSet, Formatable
+  class Line < LineSet::Item
+    include LineSet
     
     attr_reader :text, :formatting
     
@@ -20,13 +20,12 @@ class Subtitle
     # Create a new line with a time span (requred range of
     # time), text a previous line and formatting options.
     
-    def initialize time_span, text = '', previous_line: nil
+    def initialize time_span, text = '', previous_line: nil, next_line: nil
+      super(after: previous_line, before: next_line)
+      
       @time_span = time_span
-      @next_line = nil
-      @prev_line = previous_line
       @text      = text.to_s
       
-      previous_line.next = self if previous_line
       
       @formatting = Hash.new do |list, section|
         list[section] = Formatting.new
@@ -125,54 +124,13 @@ class Subtitle
     end
     
     
-    # Next
-    #
-    # Get the line after this one. Raises a StopIteration exception if this line 
-    # is the last.
-    
-    def next
-      raise StopIteration if last?
-      @next_line
-    end
-    
-    
-    # Next =
-    #
-    # Protected setter of the next line. This method is only ment to be called 
-    # by other lines when adding, moving or removing them.
-    
-    protected def next= line
-      @next_line = line
-    end
-    
-    
-    # Previous
-    #
-    # Get the previous line. Raises a StopIteration exception if this line is
-    # the first.
-    
-    def previous
-      raise StopIteration if first?
-      @prev_line
-    end
-    
-    
-    # Previous =
-    #
-    # Protected setter of the previous line. This method is only ment to be 
-    # called by other lines when adding, moving or removing them.
-    
-    protected def previous= line
-      @prev_line = line
-    end
-    
     
     # First?
     #
     # Returns true if this is the first line in a sequence.
     
     def first?
-      @prev_line.nil?
+      previous!.first_item?
     end
     
     
@@ -181,27 +139,61 @@ class Subtitle
     # Returns true if this is the last line in a sequence.
     
     def last?
-      @next_line.nil?
+      next!.last_item?
     end
     
     
-    protected def first_line
-      self
+    # Format
+    #
+    # Accept the various styling options as named arguments.
+    # Using apply to the scope of the formatting can be 
+    # controlled as follows:
+    # - nil applies to the entire line
+    # - 0, 1, ... applies to the first, second and so on section of text 
+    #   separated by new-line characters
+    # - 0..n applies to the characters at index 0 through n
+    
+    def format section = nil, fmt = {}
+      
+      if Hash === section
+        section, fmt = nil, section
+      end
+      
+      # Convert supported section types to character ranges
+      section = case section
+      when NilClass
+        0...@text.length
+      
+      when Range
+        if section.begin < 0 || section.end >= @text.length
+          raise RangeError, 
+              'The range covers more than the text'
+        end
+        
+        section
+        
+      when Fixnum
+        offsets = @text.split("\n").map(&:length)
+        
+        if section >= offsets.count
+          raise RangeError, 
+              "The line does not contain #{section} sections"
+        end
+        
+        from    = offsets[0...section].reduce(0) { |s,o| s + o + 1 }
+        to      = from + offsets[section] - 1
+        
+        from..to
+      
+      else
+        raise TypeError, 
+            "Unknown formatting section: #{section.inspect}"
+      end
+      
+      # Apply the formatting to the selected section of the
+      # line text
+      formatting[section].apply fmt
     end
-    
-    protected def last_line
-      self
-    end
-    
-    
-    def delete
-      # Get the lines on either side of this line and connect them up
-      @next_line.previous = @prev_line unless last?
-      @prev_line.next     = @next_line unless first?
-    end
-    
-    
-
     
     
     # Inspect
