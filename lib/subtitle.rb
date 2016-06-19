@@ -1,7 +1,8 @@
 require 'subtitle/version'
+require 'subtitle/formatting'
+require 'subtitle/formatable'
 require 'subtitle/line_set'
 require 'subtitle/line'
-require 'subtitle/formatting'
 
 
 class Subtitle
