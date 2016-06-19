@@ -131,5 +131,25 @@ describe Subtitle::LineSet do
       @first_line.delete_at n_lines
       assert_equal lines_before_delete, @first_line.to_a
     end
+    
+    it 'deletes the last line when the offset is -1' do
+      second_to_last_line = @last_line.previous
+      refute second_to_last_line.last?
+      @last_line.delete_at (-1)
+      
+      assert second_to_last_line.last?
+    end
+    
+    it 'deletes the second to last line when the offset is -2' do
+      third_to_last_line = @last_line.previous.previous
+      @last_line.delete_at (-2)
+      
+      assert_equal third_to_last_line, @last_line.previous
+    end
+    
+    it 'does not fail on empty sets' do
+      empty_set = Subtitle.new
+      assert_silent { empty_set.delete_at 0 }
+    end
   end
 end

@@ -24,7 +24,7 @@ class Subtitle
       line = first after: after
       
       # Return if no lines start after the given time
-      return unless line
+      return if line.nil?
       
       # Decide what condition should be used for stoping
       # the iteration
@@ -165,11 +165,25 @@ class Subtitle
     end
     
     
+    # Delete At
+    #
+    # Delete the line at the given offset, from the first line. If the offset is  
+    # negative it is instead used "in reverse".
+    
     def delete_at offset
-      line = first_line
-      return unless line
+      if offset >= 0
+        line = first_line
+        return unless line
+        
+        offset.times { line = line.next }
+      else
+        line = last_line
+        return unless line
+        
+        (-offset - 1).times { line = line.previous }
+      end
       
-      offset.times { line = line.next }
+     
       
       line.delete
       

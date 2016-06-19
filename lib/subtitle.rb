@@ -1,19 +1,16 @@
 require 'subtitle/version'
 require 'subtitle/line_set'
-require 'subtitle/nil_line'
 require 'subtitle/line'
 require 'subtitle/formatting'
 
 
 class Subtitle
   include LineSet
-  
-  attr_reader :last_line
     
   def initialize
     # The actual first line is a helper object that allows
     # the #add method to be more general
-    @first_line = NilLine.new
+    @first_line = self
     # Point to the first line
     @last_line  = @first_line
   end
@@ -24,7 +21,25 @@ class Subtitle
   end
   
   
+  def next= line
+    if @first_line == self
+      @first_line = line
+      define_singleton_method(:first_line) { @first_line }
+      define_singleton_method(:last_line)  { @last_line  }
+    else
+      line.previous = @last_line
+      @last_line.next = line
+      @last_line = line
+    end
+  end
+  
+  
   def first_line
-    @first_line.next
+    nil
+  end
+  
+  
+  def last_line
+    nil
   end
 end
